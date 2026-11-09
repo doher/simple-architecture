@@ -1,0 +1,46 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "files": {
+    "includes": ["**", "!!.idea", "!!dist", "!pnpm-lock.yaml"]
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 80
+  },
+  "javascript": {
+    "formatter": {
+      "semicolons": "always"
+    }
+  },
+  "linter": {
+    "rules": {
+      "preset": "recommended",
+      "complexity": {
+        "noUselessTypeConstraint": "error"
+      },
+      "style": {
+        "noExcessiveLinesPerFile": {
+          "level": "error",
+          "options": {
+            "maxLines": 120
+          }
+        }
+      },
+      "suspicious": {
+        "noExplicitAny": "error"
+      }
+    }
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "html": {
+    "experimentalFullSupportEnabled": true
+  }
+}
