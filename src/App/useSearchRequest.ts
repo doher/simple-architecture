@@ -5,45 +5,57 @@ import type { SearchState } from "./types";
 const DEBOUNCE_MS = 350;
 
 export function useSearchRequest(
-  query: string,
-  onRequestStart: (query: string) => void,
+  draftQuery: string,
+  onQueryCommit: () => void,
 ) {
   const [search, setSearch] = useState<SearchState>(() =>
-    query ? { status: "loading", query, delay: 0 } : { status: "idle" },
+    draftQuery ? { status: "loading", query: draftQuery } : { status: "idle" },
   );
-  const request = search.status === "loading" ? search : null;
+  const committedQuery = search.status === "idle" ? "" : search.query;
+  const request =
+    search.status === "loading" && committedQuery === draftQuery
+      ? search
+      : null;
+
+  useEffect(() => {
+    if (!draftQuery || draftQuery === committedQuery) return;
+
+    const timer = window.setTimeout(() => {
+      onQueryCommit();
+      setSearch({ status: "loading", query: draftQuery });
+    }, DEBOUNCE_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [draftQuery, committedQuery, onQueryCommit]);
 
   useEffect(() => {
     if (!request) return;
 
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
-      onRequestStart(request.query);
       const outcome = await searchShows(request.query, controller.signal);
       if (controller.signal.aborted) return;
 
-      setSearch((current) => (current === request ? outcome : current));
-    }, request.delay);
+      setSearch((current) =>
+        current === request ? { ...outcome, query: request.query } : current,
+      );
+    }, 0);
 
     return () => {
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [request, onRequestStart]);
+  }, [request]);
 
-  const scheduleSearch = (nextQuery: string) => {
-    setSearch(
-      nextQuery
-        ? { status: "loading", query: nextQuery, delay: DEBOUNCE_MS }
-        : { status: "idle" },
-    );
+  const clearSearch = () => {
+    setSearch({ status: "idle" });
   };
 
   const retry = () => {
     if (search.status === "error") {
-      setSearch({ status: "loading", query, delay: 0 });
+      setSearch({ status: "loading", query: search.query });
     }
   };
 
-  return { search, scheduleSearch, retry };
+  return { search, committedQuery, clearSearch, retry };
 }

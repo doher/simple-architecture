@@ -16,8 +16,7 @@ export type SearchOutcome =
 
 export type SearchState =
   | { status: "idle" }
-  | { status: "loading"; query: string; delay: number }
-  | SearchOutcome;
+  | ({ query: string } & ({ status: "loading" } | SearchOutcome));
 
 export type SearchStatus = SearchState["status"];
 

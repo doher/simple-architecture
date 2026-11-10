@@ -8,30 +8,22 @@ export function usePresenter() {
   const { query, genre: requestedGenre, page: requestedPage } = searchParams;
   const term = query.trim();
 
-  const syncRequestedSearchUrl = useCallback(
-    (requestedQuery: string) => {
-      replaceSearchUrl({
-        query: requestedQuery,
-        genre: requestedGenre,
-        page: requestedPage,
-      });
-    },
-    [requestedGenre, requestedPage],
-  );
-  const { search, scheduleSearch, retry } = useSearchRequest(
+  const resetSelection = useCallback(() => {
+    setSearchParams((current) => ({ ...current, genre: null, page: 1 }));
+  }, []);
+  const { search, committedQuery, clearSearch, retry } = useSearchRequest(
     term,
-    syncRequestedSearchUrl,
+    resetSelection,
   );
 
   const setQuery = (value: string) => {
-    const nextTerm = value.trim();
-    if (nextTerm === term) {
+    if (value.trim()) {
       setSearchParams((current) => ({ ...current, query: value }));
       return;
     }
 
     setSearchParams({ query: value, genre: null, page: 1 });
-    scheduleSearch(nextTerm);
+    clearSearch();
   };
 
   const selectGenre = (genre: string | null) => {
@@ -44,12 +36,12 @@ export function usePresenter() {
     requestedPage,
   );
   const { page, pageCount, selectedGenre } = results;
+  const urlGenre = search.status === "success" ? selectedGenre : requestedGenre;
+  const urlPage = search.status === "success" ? page : requestedPage;
 
   useEffect(() => {
-    if (search.status === "success" || search.status === "idle") {
-      replaceSearchUrl({ query: term, genre: selectedGenre, page });
-    }
-  }, [search.status, term, page, selectedGenre]);
+    replaceSearchUrl({ query: committedQuery, genre: urlGenre, page: urlPage });
+  }, [committedQuery, urlGenre, urlPage]);
 
   const goToPage = (nextPage: number) => {
     if (Number.isInteger(nextPage) && nextPage >= 1 && nextPage <= pageCount) {
