@@ -2,11 +2,12 @@ import type { SearchHit, SearchOutcome } from "./types";
 
 const SEARCH_URL = "https://api.tvmaze.com/search/shows";
 const SEARCH_ERROR = "Не удалось загрузить сериалы. Попробуйте ещё раз.";
+const HTTP_TOO_MANY_REQUESTS = 429;
 
-export async function searchShows(
+export const searchShows = async (
   query: string,
   signal: AbortSignal,
-): Promise<SearchOutcome> {
+): Promise<SearchOutcome> => {
   try {
     const url = new URL(SEARCH_URL);
     url.searchParams.set("q", query);
@@ -16,7 +17,7 @@ export async function searchShows(
       return {
         status: "error",
         errorMessage:
-          response.status === 429
+          response.status === HTTP_TOO_MANY_REQUESTS
             ? "Слишком много запросов. Попробуйте через несколько секунд."
             : SEARCH_ERROR,
       };
@@ -27,4 +28,4 @@ export async function searchShows(
   } catch {
     return { status: "error", errorMessage: SEARCH_ERROR };
   }
-}
+};
