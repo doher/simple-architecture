@@ -1,8 +1,3 @@
-import type { SearchStatus } from "~/App/types";
-
-export interface SearchFeedbackProps {
-  status: Exclude<SearchStatus, "idle">;
-  isEmpty: boolean;
-  errorMessage: string;
-  onRetry: () => void;
-}
+export type SearchFeedbackProps =
+  | { kind: "status"; message: string }
+  | { kind: "error"; message: string; onRetry: () => void };

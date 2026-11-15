@@ -4,8 +4,10 @@ import { SearchFeedback } from "./SearchFeedback/SearchFeedback";
 import styles from "./SearchResults.module.css";
 import { ShowCard } from "./ShowCard/ShowCard";
 import type { SearchResultsProps } from "./types";
+import { usePresenter } from "./usePresenter";
 
 export const SearchResults = (props: SearchResultsProps) => {
+  const feedback = usePresenter(props);
   const { first, last, total } = props.resultRange;
   const isSuccess = props.status === "success";
 
@@ -18,12 +20,7 @@ export const SearchResults = (props: SearchResultsProps) => {
         </p>
       </div>
 
-      <SearchFeedback
-        status={props.status}
-        isEmpty={total === 0}
-        errorMessage={props.errorMessage}
-        onRetry={props.onRetry}
-      />
+      {feedback !== null && <SearchFeedback {...feedback} />}
 
       {isSuccess && total > 0 && (
         <>
