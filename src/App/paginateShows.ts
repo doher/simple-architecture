@@ -2,18 +2,6 @@ import type { ResultRange, Show } from "./types";
 
 const PAGE_SIZE = 3;
 
-export const getShowGenres = (shows: readonly Show[]) => {
-  const uniqueGenres = new Set<string>();
-
-  for (const show of shows) {
-    for (const genre of show.genres) {
-      uniqueGenres.add(genre);
-    }
-  }
-
-  return [...uniqueGenres].sort();
-};
-
 export const paginateShows = (
   shows: readonly Show[],
   requestedPage: number,
