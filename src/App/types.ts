@@ -14,7 +14,7 @@ export type SearchOutcome =
   | { status: "success"; shows: Show[] }
   | { status: "error"; errorMessage: string };
 
-type SearchRequest = { query: string };
+export type SearchRequest = { query: string };
 
 type CompletedSearch = { request: SearchRequest } & SearchOutcome;
 
