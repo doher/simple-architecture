@@ -14,11 +14,20 @@ export type SearchOutcome =
   | { status: "success"; shows: Show[] }
   | { status: "error"; errorMessage: string };
 
+type SearchRequest = { query: string };
+
+type CompletedSearch = { request: SearchRequest } & SearchOutcome;
+
 export type SearchState =
   | { status: "idle" }
-  | ({ query: string } & ({ status: "loading" } | SearchOutcome));
+  | {
+      status: "pending";
+      request: SearchRequest;
+      previous: Extract<CompletedSearch, { status: "success" }> | null;
+    }
+  | CompletedSearch;
 
-export type SearchStatus = SearchState["status"];
+export type SearchStatus = SearchState["status"] | "loading";
 
 export type SearchUrlState = {
   query: string;

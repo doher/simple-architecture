@@ -1,51 +1,76 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { prepareSearchResults } from "./prepareSearchResults";
 import { readSearchUrl, replaceSearchUrl } from "./searchUrl";
+import type { SearchStatus } from "./types";
 import { useSearchRequest } from "./useSearchRequest";
 
-export function usePresenter() {
-  const [searchParams, setSearchParams] = useState(readSearchUrl);
-  const { query, genre: requestedGenre, page: requestedPage } = searchParams;
-  const term = query.trim();
+const DEFAULT_SELECTION = { genre: null, page: 1 };
 
-  const resetSelection = useCallback(() => {
-    setSearchParams((current) => ({ ...current, genre: null, page: 1 }));
-  }, []);
-  const { search, committedQuery, clearSearch, retry } = useSearchRequest(
-    term,
-    resetSelection,
-  );
+export const usePresenter = () => {
+  const [initialSearch] = useState(readSearchUrl);
+  const [query, setDraftQuery] = useState(initialSearch.query);
+  const { search, committedQuery, isLoadingVisible, clearSearch, retry } =
+    useSearchRequest(query.trim());
+  const displayedSearch =
+    search.status === "pending" && !isLoadingVisible
+      ? (search.previous ?? search)
+      : search;
+  const status: SearchStatus = isLoadingVisible
+    ? "loading"
+    : displayedSearch.status;
 
-  const setQuery = (value: string) => {
-    if (value.trim()) {
-      setSearchParams((current) => ({ ...current, query: value }));
-      return;
-    }
-
-    setSearchParams({ query: value, genre: null, page: 1 });
-    clearSearch();
-  };
-
-  const selectGenre = (genre: string | null) => {
-    setSearchParams((current) => ({ ...current, genre, page: 1 }));
-  };
-
+  const request = search.status === "idle" ? null : search.request;
+  const displayedRequest =
+    displayedSearch.status === "idle" ? null : displayedSearch.request;
+  const [selection, setSelection] = useState(() => ({
+    request,
+    genre: initialSearch.genre,
+    page: initialSearch.page,
+  }));
+  const displayedSelection =
+    selection.request === displayedRequest ? selection : DEFAULT_SELECTION;
   const results = prepareSearchResults(
-    search.status === "success" ? search.shows : [],
-    requestedGenre,
-    requestedPage,
+    displayedSearch.status === "success" ? displayedSearch.shows : [],
+    displayedSelection.genre,
+    displayedSelection.page,
   );
-  const { page, pageCount, selectedGenre } = results;
-  const urlGenre = search.status === "success" ? selectedGenre : requestedGenre;
-  const urlPage = search.status === "success" ? page : requestedPage;
+
+  const urlSelection =
+    selection.request === request ? selection : DEFAULT_SELECTION;
+  const isSearchSuccessful = search.status === "success";
+  const urlGenre = isSearchSuccessful
+    ? results.selectedGenre
+    : urlSelection.genre;
+  const urlPage = isSearchSuccessful ? results.page : urlSelection.page;
 
   useEffect(() => {
     replaceSearchUrl({ query: committedQuery, genre: urlGenre, page: urlPage });
   }, [committedQuery, urlGenre, urlPage]);
 
+  const setQuery = (value: string) => {
+    setDraftQuery(value);
+
+    if (!value.trim()) {
+      clearSearch();
+    }
+  };
+
+  const selectGenre = (genre: string | null) => {
+    setSelection({ request: displayedRequest, genre, page: 1 });
+  };
+
   const goToPage = (nextPage: number) => {
-    if (Number.isInteger(nextPage) && nextPage >= 1 && nextPage <= pageCount) {
-      setSearchParams((current) => ({ ...current, page: nextPage }));
+    const isValidPage =
+      Number.isInteger(nextPage) &&
+      nextPage >= 1 &&
+      nextPage <= results.pageCount;
+
+    if (isValidPage) {
+      setSelection((current) => ({
+        request: displayedRequest,
+        genre: current.request === displayedRequest ? current.genre : null,
+        page: nextPage,
+      }));
     }
   };
 
@@ -53,10 +78,10 @@ export function usePresenter() {
     ...results,
     query,
     setQuery,
-    status: search.status,
+    status,
     errorMessage: search.status === "error" ? search.errorMessage : "",
     retry,
     selectGenre,
     goToPage,
   };
-}
+};

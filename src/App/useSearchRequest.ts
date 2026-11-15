@@ -1,51 +1,42 @@
 import { useEffect, useState } from "react";
-import { searchShows } from "./searchShows";
 import type { SearchState } from "./types";
+import { usePendingSearch } from "./usePendingSearch";
 
 const DEBOUNCE_MS = 350;
 
-export function useSearchRequest(
-  draftQuery: string,
-  onQueryCommit: () => void,
-) {
+export const useSearchRequest = (draftQuery: string) => {
   const [search, setSearch] = useState<SearchState>(() =>
-    draftQuery ? { status: "loading", query: draftQuery } : { status: "idle" },
+    draftQuery
+      ? { status: "pending", request: { query: draftQuery }, previous: null }
+      : { status: "idle" },
   );
-  const committedQuery = search.status === "idle" ? "" : search.query;
-  const request =
-    search.status === "loading" && committedQuery === draftQuery
-      ? search
-      : null;
+  const committedQuery = search.status === "idle" ? "" : search.request.query;
 
   useEffect(() => {
-    if (!draftQuery || draftQuery === committedQuery) return;
+    // Committing a query changes committedQuery and reruns this effect.
+    if (draftQuery === committedQuery) {
+      return;
+    }
 
-    const timer = window.setTimeout(() => {
-      onQueryCommit();
-      setSearch({ status: "loading", query: draftQuery });
+    const timer = setTimeout(() => {
+      setSearch((current) => {
+        const previous =
+          current.status === "pending" ? current.previous : current;
+        const hasPreviousResults =
+          previous?.status === "success" && previous.shows.length > 0;
+
+        return {
+          status: "pending",
+          request: { query: draftQuery },
+          previous: hasPreviousResults ? previous : null,
+        };
+      });
     }, DEBOUNCE_MS);
 
-    return () => window.clearTimeout(timer);
-  }, [draftQuery, committedQuery, onQueryCommit]);
+    return () => clearTimeout(timer);
+  }, [draftQuery, committedQuery]);
 
-  useEffect(() => {
-    if (!request) return;
-
-    const controller = new AbortController();
-    const timer = window.setTimeout(async () => {
-      const outcome = await searchShows(request.query, controller.signal);
-      if (controller.signal.aborted) return;
-
-      setSearch((current) =>
-        current === request ? { ...outcome, query: request.query } : current,
-      );
-    }, 0);
-
-    return () => {
-      window.clearTimeout(timer);
-      controller.abort();
-    };
-  }, [request]);
+  const isLoadingVisible = usePendingSearch(draftQuery, search, setSearch);
 
   const clearSearch = () => {
     setSearch({ status: "idle" });
@@ -53,9 +44,9 @@ export function useSearchRequest(
 
   const retry = () => {
     if (search.status === "error") {
-      setSearch({ status: "loading", query: search.query });
+      setSearch({ status: "pending", request: search.request, previous: null });
     }
   };
 
-  return { search, committedQuery, clearSearch, retry };
-}
+  return { search, committedQuery, isLoadingVisible, clearSearch, retry };
+};
