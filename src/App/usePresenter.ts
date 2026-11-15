@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
-import { readSearchUrl, replaceSearchUrl } from "./searchUrl";
+import { useState } from "react";
+import { readSearchUrl } from "./readSearchUrl";
 import type { SearchStatus } from "./types";
 import { useSearchRequest } from "./useSearchRequest";
 import { useSearchResults } from "./useSearchResults";
+import { useSyncSearchUrl } from "./useSyncSearchUrl";
 
 const DEFAULT_SELECTION = { genre: null, page: 1 };
 
@@ -43,9 +44,7 @@ export const usePresenter = () => {
     : urlSelection.genre;
   const urlPage = isSearchSuccessful ? results.page : urlSelection.page;
 
-  useEffect(() => {
-    replaceSearchUrl({ query: committedQuery, genre: urlGenre, page: urlPage });
-  }, [committedQuery, urlGenre, urlPage]);
+  useSyncSearchUrl({ query: committedQuery, genre: urlGenre, page: urlPage });
 
   const setQuery = (value: string) => {
     setDraftQuery(value);
