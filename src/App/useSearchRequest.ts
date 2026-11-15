@@ -1,45 +1,35 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { SearchState } from "./types";
+import { useDebouncedQueryCommit } from "./useDebouncedQueryCommit";
 import { usePendingSearch } from "./usePendingSearch";
 
-const DEBOUNCE_MS = 350;
-
-export const useSearchRequest = (draftQuery: string) => {
+export const useSearchRequest = (initialQuery: string) => {
+  const [draftQuery, setDraftQuery] = useState(initialQuery);
+  const normalizedDraftQuery = draftQuery.trim();
   const [search, setSearch] = useState<SearchState>(() =>
-    draftQuery
-      ? { status: "pending", request: { query: draftQuery }, previous: null }
+    normalizedDraftQuery
+      ? {
+          status: "pending",
+          request: { query: normalizedDraftQuery },
+          previous: null,
+        }
       : { status: "idle" },
   );
   const committedQuery = search.status === "idle" ? "" : search.request.query;
 
-  useEffect(() => {
-    // Committing a query changes committedQuery and reruns this effect.
-    if (draftQuery === committedQuery) {
-      return;
+  useDebouncedQueryCommit(normalizedDraftQuery, committedQuery, setSearch);
+  const isLoadingVisible = usePendingSearch(
+    normalizedDraftQuery,
+    search,
+    setSearch,
+  );
+
+  const setQuery = (value: string) => {
+    setDraftQuery(value);
+
+    if (!value.trim()) {
+      setSearch({ status: "idle" });
     }
-
-    const timer = setTimeout(() => {
-      setSearch((current) => {
-        const previous =
-          current.status === "pending" ? current.previous : current;
-        const hasPreviousResults =
-          previous?.status === "success" && previous.shows.length > 0;
-
-        return {
-          status: "pending",
-          request: { query: draftQuery },
-          previous: hasPreviousResults ? previous : null,
-        };
-      });
-    }, DEBOUNCE_MS);
-
-    return () => clearTimeout(timer);
-  }, [draftQuery, committedQuery]);
-
-  const isLoadingVisible = usePendingSearch(draftQuery, search, setSearch);
-
-  const clearSearch = () => {
-    setSearch({ status: "idle" });
   };
 
   const retry = () => {
@@ -48,5 +38,12 @@ export const useSearchRequest = (draftQuery: string) => {
     }
   };
 
-  return { search, committedQuery, isLoadingVisible, clearSearch, retry };
+  return {
+    search,
+    query: draftQuery,
+    setQuery,
+    committedQuery,
+    isLoadingVisible,
+    retry,
+  };
 };

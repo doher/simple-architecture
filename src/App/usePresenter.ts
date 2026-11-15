@@ -9,9 +9,8 @@ const DEFAULT_SELECTION = { genre: null, page: 1 };
 
 export const usePresenter = () => {
   const [initialSearch] = useState(readSearchUrl);
-  const [query, setDraftQuery] = useState(initialSearch.query);
-  const { search, committedQuery, isLoadingVisible, clearSearch, retry } =
-    useSearchRequest(query.trim());
+  const { search, query, setQuery, committedQuery, isLoadingVisible, retry } =
+    useSearchRequest(initialSearch.query);
   const displayedSearch =
     search.status === "pending" && !isLoadingVisible
       ? (search.previous ?? search)
@@ -45,14 +44,6 @@ export const usePresenter = () => {
   const urlPage = isSearchSuccessful ? results.page : urlSelection.page;
 
   useSyncSearchUrl({ query: committedQuery, genre: urlGenre, page: urlPage });
-
-  const setQuery = (value: string) => {
-    setDraftQuery(value);
-
-    if (!value.trim()) {
-      clearSearch();
-    }
-  };
 
   const selectGenre = (genre: string | null) => {
     setSelection({ request: displayedRequest, genre, page: 1 });
