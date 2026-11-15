@@ -1,9 +1,9 @@
 import { type ChangeEvent, useId, useRef } from "react";
-import type { SearchHeaderProps } from "./types";
+import type { SearchFieldProps } from "./types";
 
-export function usePresenter(
-  onQueryChange: SearchHeaderProps["onQueryChange"],
-) {
+export const usePresenter = (
+  onQueryChange: SearchFieldProps["onQueryChange"],
+) => {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -17,4 +17,4 @@ export function usePresenter(
   };
 
   return { inputId, inputRef, changeQuery, clearQuery };
-}
+};

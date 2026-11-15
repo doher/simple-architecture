@@ -1,6 +1,6 @@
 import styles from "./Horizon.module.css";
 
-export function Horizon() {
+export const Horizon = () => {
   return (
     <div className={styles.horizon} aria-hidden="true">
       <span className={styles.sun} />
@@ -8,4 +8,4 @@ export function Horizon() {
       <span className={styles.terrain} />
     </div>
   );
-}
+};

@@ -1,4 +1,3 @@
-export interface SearchHeaderProps {
-  query: string;
-  onQueryChange: (value: string) => void;
-}
+import type { SearchFieldProps } from "./SearchField/types";
+
+export type SearchHeaderProps = SearchFieldProps;
