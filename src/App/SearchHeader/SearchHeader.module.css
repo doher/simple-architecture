@@ -1,0 +1,12 @@
+.hero {
+  position: relative;
+  isolation: isolate;
+  padding: 25px 0 27px;
+}
+
+@media (max-width: 530px) {
+  .hero {
+    padding-top: 23px;
+    padding-bottom: 21px;
+  }
+}

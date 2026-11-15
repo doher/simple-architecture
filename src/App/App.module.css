@@ -3,5 +3,36 @@
 }
 
 .root {
+  --kadr-bg: #100b1b;
+  --kadr-field: #1b132b;
+  --kadr-text: #fbf4ff;
+  --kadr-muted: #c4b3d5;
+  --kadr-line: #554166;
+  --kadr-accent: #79f6ef;
+  --kadr-on-accent: #102328;
+  --kadr-pink: #ff66bb;
+  --kadr-amber: #ffbd85;
+
+  color-scheme: dark;
   min-height: 100dvh;
+  color: var(--kadr-text);
+  background:
+    radial-gradient(ellipse at 79% 1%, #3f194eb3, transparent 53%),
+    linear-gradient(160deg, #150d24, var(--kadr-bg) 73%);
+  font:
+    15px / 1.45 system-ui,
+    sans-serif;
+}
+
+.root,
+.root *,
+.root *::before,
+.root *::after {
+  box-sizing: border-box;
+}
+
+.shell {
+  max-width: 1100px;
+  margin-inline: auto;
+  padding: 0 clamp(16px, 5.4vw, 58px) 24px;
 }

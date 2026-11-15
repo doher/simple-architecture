@@ -1,0 +1,24 @@
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: fit-content;
+  margin: 0 0 22px;
+  font:
+    italic 900 20px / 1.2 system-ui,
+    sans-serif;
+  letter-spacing: 0.13em;
+}
+
+.brandDot {
+  color: var(--kadr-pink);
+}
+
+.mark {
+  width: 24px;
+  height: 17px;
+  color: var(--kadr-amber);
+  stroke: var(--kadr-pink);
+  transform: skewX(-10deg);
+  filter: drop-shadow(0 0 6px #ff66bb65);
+}

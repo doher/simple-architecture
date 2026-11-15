@@ -24,7 +24,14 @@
     "rules": {
       "preset": "recommended",
       "complexity": {
-        "noUselessTypeConstraint": "error"
+        "noUselessTypeConstraint": "error",
+        "useArrowFunction": "error"
+      },
+      "nursery": {
+        "useConsistentFunctionStyle": {
+          "level": "error",
+          "options": { "style": "expression" }
+        }
       },
       "style": {
         "noExcessiveLinesPerFile": {
@@ -32,7 +39,9 @@
           "options": {
             "maxLines": 120
           }
-        }
+        },
+        "noMagicNumbers": "error",
+        "useBlockStatements": "error"
       },
       "suspicious": {
         "noExplicitAny": "error"

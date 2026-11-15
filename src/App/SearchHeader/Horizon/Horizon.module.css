@@ -1,0 +1,99 @@
+.horizon {
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 0 29%;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.93;
+  mask-image: linear-gradient(to right, transparent, #000 34% 89%, transparent);
+}
+
+.horizon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 53% 26%, #f9bdf0 1px, transparent 1.6px),
+    radial-gradient(circle at 87% 18%, #e5baff 1px, transparent 1.6px),
+    radial-gradient(circle at 92% 38%, #b38aff 1px, transparent 1.6px),
+    radial-gradient(circle at 65% 12%, #baa0ff 1px, transparent 1.6px),
+    radial-gradient(circle at 66% 63%, #df4d9bb3, transparent 53%);
+}
+
+.sun {
+  position: absolute;
+  width: clamp(117px, 17vw, 176px);
+  aspect-ratio: 1;
+  top: 12px;
+  right: 15%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ffcf91 5%, #ff8d99 45%, #fa4aac 82%);
+  mask-image: linear-gradient(
+    #000 55%,
+    transparent 55% 57%,
+    #000 57% 64%,
+    transparent 64% 67%,
+    #000 67% 73%,
+    transparent 73% 77%,
+    #000 77% 82%,
+    transparent 82% 87%,
+    #000 87% 91%,
+    transparent 91% 96%,
+    #000 96%
+  );
+}
+
+.ridge {
+  position: absolute;
+  inset: 40% 0 15%;
+  background: linear-gradient(165deg, #9142a4, #2a143d 61%);
+  clip-path: polygon(
+    0 100%,
+    0 74%,
+    10% 54%,
+    17% 63%,
+    28% 32%,
+    37% 51%,
+    47% 21%,
+    60% 69%,
+    68% 78%,
+    79% 48%,
+    87% 22%,
+    97% 56%,
+    100% 50%,
+    100% 100%
+  );
+}
+
+.ridge::after {
+  content: "";
+  position: absolute;
+  inset: 5px 0 0;
+  background: linear-gradient(180deg, #2b163e, #170d27);
+  clip-path: inherit;
+}
+
+.terrain {
+  position: absolute;
+  inset: 76% -12% -65%;
+  transform: perspective(93px) rotateX(47deg);
+  transform-origin: center top;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 52px, #b450b98a 53px 54px),
+    repeating-linear-gradient(0deg, transparent 0 22px, #d15baf80 23px 24px),
+    linear-gradient(180deg, #481b50, #1d102d 45%);
+  box-shadow: 0 -1px 16px #fb59b878;
+  border-top: 1px solid #fa8ad8;
+}
+
+@media (max-width: 530px) {
+  .horizon {
+    inset-inline: 10% -16px;
+    opacity: 0.56;
+    mask-image: linear-gradient(to right, transparent 18%, #000 64%);
+  }
+
+  .sun {
+    right: -14px;
+  }
+}
