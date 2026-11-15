@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { prepareSearchResults } from "./prepareSearchResults";
 import { readSearchUrl, replaceSearchUrl } from "./searchUrl";
 import type { SearchStatus } from "./types";
 import { useSearchRequest } from "./useSearchRequest";
+import { useSearchResults } from "./useSearchResults";
 
 const DEFAULT_SELECTION = { genre: null, page: 1 };
 
@@ -29,8 +29,8 @@ export const usePresenter = () => {
   }));
   const displayedSelection =
     selection.request === displayedRequest ? selection : DEFAULT_SELECTION;
-  const results = prepareSearchResults(
-    displayedSearch.status === "success" ? displayedSearch.shows : [],
+  const results = useSearchResults(
+    displayedSearch,
     displayedSelection.genre,
     displayedSelection.page,
   );

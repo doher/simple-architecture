@@ -2,21 +2,23 @@ import type { ResultRange, Show } from "./types";
 
 const PAGE_SIZE = 3;
 
-export function prepareSearchResults(
-  results: Show[],
-  requestedGenre: string | null,
+export const getShowGenres = (shows: readonly Show[]) => {
+  const uniqueGenres = new Set<string>();
+
+  for (const show of shows) {
+    for (const genre of show.genres) {
+      uniqueGenres.add(genre);
+    }
+  }
+
+  return [...uniqueGenres].sort();
+};
+
+export const paginateShows = (
+  shows: readonly Show[],
   requestedPage: number,
-) {
-  const genres = [...new Set(results.flatMap((show) => show.genres))].sort();
-  const selectedGenre =
-    requestedGenre !== null && genres.includes(requestedGenre)
-      ? requestedGenre
-      : null;
-  const filtered =
-    selectedGenre === null
-      ? results
-      : results.filter((show) => show.genres.includes(selectedGenre));
-  const total = filtered.length;
+) => {
+  const total = shows.length;
   const pageCount = Math.ceil(total / PAGE_SIZE);
   const page = Math.min(requestedPage, pageCount || 1);
   const offset = (page - 1) * PAGE_SIZE;
@@ -27,11 +29,9 @@ export function prepareSearchResults(
   };
 
   return {
-    genres,
-    selectedGenre,
     page,
     pageCount,
     resultRange,
-    shows: filtered.slice(offset, offset + PAGE_SIZE),
+    shows: shows.slice(offset, offset + PAGE_SIZE),
   };
-}
+};
