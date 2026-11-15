@@ -3,7 +3,7 @@ import { SearchHeader } from "./SearchHeader/SearchHeader";
 import { SearchResults } from "./SearchResults/SearchResults";
 import { usePresenter } from "./usePresenter";
 
-export function App() {
+export const App = () => {
   const search = usePresenter();
 
   return (
@@ -15,9 +15,11 @@ export function App() {
             status={search.status}
             errorMessage={search.errorMessage}
             onRetry={search.retry}
-            genres={search.genres}
-            selectedGenre={search.selectedGenre}
-            onGenreChange={search.selectGenre}
+            genreFilters={{
+              genres: search.genres,
+              selectedGenre: search.selectedGenre,
+              onGenreChange: search.selectGenre,
+            }}
             pagination={{
               page: search.page,
               pageCount: search.pageCount,
@@ -30,4 +32,4 @@ export function App() {
       </div>
     </main>
   );
-}
+};

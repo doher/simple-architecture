@@ -1,4 +1,4 @@
-import type { Show } from "../../types";
+import type { Show } from "~/App/types";
 
 export interface ShowCardProps {
   show: Show;

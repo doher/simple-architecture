@@ -2,7 +2,7 @@ import styles from "./ShowCard.module.css";
 import type { ShowCardProps } from "./types";
 import { usePresenter } from "./usePresenter";
 
-export function ShowCard({ show }: ShowCardProps) {
+export const ShowCard = ({ show }: ShowCardProps) => {
   const { metadata, rating, poster, handlePosterError } = usePresenter({
     show,
   });
@@ -44,4 +44,4 @@ export function ShowCard({ show }: ShowCardProps) {
       </a>
     </li>
   );
-}
+};

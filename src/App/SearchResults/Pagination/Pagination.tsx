@@ -1,17 +1,18 @@
-import { Button } from "../../../ui-kit/Button/Button";
+import { Button } from "~/ui-kit/Button/Button";
 import styles from "./Pagination.module.css";
 import type { PaginationProps } from "./types";
 import { usePresenter } from "./usePresenter";
 
-export function Pagination(props: PaginationProps) {
+export const Pagination = (props: PaginationProps) => {
+  const { page, pageCount } = props;
   const {
-    pages,
     currentPageButton,
     hasPagination,
     canGoBack,
     canGoForward,
     goBack,
     goForward,
+    selectPage,
   } = usePresenter(props);
 
   if (!hasPagination) {
@@ -28,18 +29,23 @@ export function Pagination(props: PaginationProps) {
       >
         ‹
       </Button>
-      {pages.map(({ number, current, label, select }) => (
-        <Button
-          className={styles.button}
-          key={number}
-          ref={current ? currentPageButton : undefined}
-          aria-label={label}
-          aria-current={current ? "page" : undefined}
-          onClick={select}
-        >
-          {number}
-        </Button>
-      ))}
+      {Array.from({ length: pageCount }, (_, index) => {
+        const number = index + 1;
+        const isCurrent = number === page;
+
+        return (
+          <Button
+            className={styles.button}
+            key={number}
+            ref={isCurrent ? currentPageButton : undefined}
+            aria-label={`Страница ${number}`}
+            aria-current={isCurrent ? "page" : undefined}
+            onClick={selectPage(number)}
+          >
+            {number}
+          </Button>
+        );
+      })}
       <Button
         className={styles.button}
         aria-label="Вперёд"
@@ -50,4 +56,4 @@ export function Pagination(props: PaginationProps) {
       </Button>
     </nav>
   );
-}
+};

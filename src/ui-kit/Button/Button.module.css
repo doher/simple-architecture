@@ -28,3 +28,16 @@
   opacity: 0.5;
   cursor: default;
 }
+
+.button:where(:global(.kadr-button-compact)) {
+  min-height: 32px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 13px;
+}
+
+@media (pointer: coarse) {
+  .button:where(:global(.kadr-button-compact)) {
+    min-height: 44px;
+  }
+}

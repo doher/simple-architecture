@@ -1,62 +1,33 @@
-import { Button } from "../../ui-kit/Button/Button";
+import { GenreFilters } from "./GenreFilters/GenreFilters";
 import { Pagination } from "./Pagination/Pagination";
+import { SearchFeedback } from "./SearchFeedback/SearchFeedback";
 import styles from "./SearchResults.module.css";
 import { ShowCard } from "./ShowCard/ShowCard";
 import type { SearchResultsProps } from "./types";
-import { usePresenter } from "./usePresenter";
 
-export function SearchResults(props: SearchResultsProps) {
-  const { chips, range } = usePresenter(props);
+export const SearchResults = (props: SearchResultsProps) => {
+  const { first, last, total } = props.resultRange;
+  const isSuccess = props.status === "success";
 
   return (
     <section className={styles.root} aria-labelledby="results-title">
       <div className={styles.heading}>
         <h2 id="results-title">Результаты</h2>
         <p className={styles.count} role="status">
-          {range}
+          {total > 0 && `${first}–${last} из ${total}`}
         </p>
       </div>
 
-      {props.status === "loading" && (
-        <p className={styles.message} role="status">
-          Ищем сериалы…
-        </p>
-      )}
+      <SearchFeedback
+        status={props.status}
+        isEmpty={total === 0}
+        errorMessage={props.errorMessage}
+        onRetry={props.onRetry}
+      />
 
-      {props.status === "error" && (
-        <div className={styles.error}>
-          <p className={styles.message} role="alert">
-            {props.errorMessage}
-          </p>
-          <Button className={styles.retry} onClick={props.onRetry}>
-            Повторить поиск
-          </Button>
-        </div>
-      )}
-
-      {props.status === "success" && props.resultRange.total === 0 && (
-        <p className={styles.message} role="status">
-          Ничего не найдено. Попробуйте другое название.
-        </p>
-      )}
-
-      {props.status === "success" && props.resultRange.total > 0 && (
+      {isSuccess && total > 0 && (
         <>
-          {props.genres.length > 0 && (
-            <fieldset className={styles.filters} aria-label="Жанры">
-              {chips.map((chip) => (
-                <Button
-                  key={chip.genre}
-                  className={styles.chip}
-                  lang={chip.genre === null ? undefined : "en"}
-                  aria-pressed={chip.active}
-                  onClick={chip.select}
-                >
-                  {chip.label}
-                </Button>
-              ))}
-            </fieldset>
-          )}
+          <GenreFilters {...props.genreFilters} />
           <ul className={styles.grid} aria-label="Найденные сериалы">
             {props.shows.map((show) => (
               <ShowCard key={show.id} show={show} />
@@ -66,11 +37,11 @@ export function SearchResults(props: SearchResultsProps) {
       )}
 
       <footer className={styles.footer}>
-        {props.status === "success" && <Pagination {...props.pagination} />}
+        {isSuccess && <Pagination {...props.pagination} />}
         <a href="https://www.tvmaze.com/" target="_blank" rel="noreferrer">
           Данные TVmaze <span aria-hidden="true">↗</span>
         </a>
       </footer>
     </section>
   );
-}
+};
